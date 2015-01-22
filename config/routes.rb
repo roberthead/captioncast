@@ -1,26 +1,29 @@
 Rails.application.routes.draw do
 
-  get 'display/select'
+  mount Bootsy::Engine => '/bootsy', as: 'bootsy'
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+  
+  get  'display/select'
   post 'display/select'
+  get  'display/index'
+  get  'display/current'
 
-  get 'upload/index'
+  get  'upload/index'
   post 'upload/index'
   post 'upload/uploadFile'
-  get 'display/index'
-  get 'display/current'
 
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
-  root 'cast#index'
+  get  'cast/index'
+  get  'cast/about'
 
-  get 'cast/index'
-  get 'cast/about'
-
-  get 'operator/index'
-  get 'operator/select'
+  get  'operator/index'
+  get  'operator/select'
   post 'operator/select'
   post 'operator/pushTextSeq'
 
-  get 'editor/index'
+  get  'editor/index'
+  post 'editor/index'
+
+  root 'cast#index'
 
 end

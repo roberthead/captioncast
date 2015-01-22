@@ -1,4 +1,5 @@
 class Text < ActiveRecord::Base
+  include Bootsy::Container
   belongs_to :work
   belongs_to :element
   validates_presence_of :work_id

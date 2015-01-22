@@ -2,6 +2,14 @@
 
 	<div class="container-fluid" id="main-editor">
 
-		<h1> here comes the editor </h1>
+		<%= form_for(@text) do |f| %>
+			<%= f.label :title %>
+			<%= f.text_field :title %>
+
+			<%= f.label :content %>
+			<%= f.bootsy_area :content %>
+
+			<%= f.submit %>
+		<% end %>
 	</div>
 </body>
