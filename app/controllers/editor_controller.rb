@@ -16,6 +16,7 @@ class EditorController < ApplicationController
 	end
 
 	def edit
+		@sample_text = Text.first
 		respond_to do |edit|
 			edit.html
 			edit.js

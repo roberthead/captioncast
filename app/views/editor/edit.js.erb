@@ -1,5 +1,1 @@
-//$("#modal-window").html("<%= escape_javascript(render 'editor/edit') %>");
-$("#modal-window").modal({
-  show: true,
-  remote: 'edit-modal'
-});
+$("#modal-window").append("<%= escape_javascript(render :partial => 'editor/edit') %>");
