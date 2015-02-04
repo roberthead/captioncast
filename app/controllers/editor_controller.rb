@@ -1,5 +1,6 @@
 class EditorController < ApplicationController
 	def index
+		@sample_text = Text.first
 		work = Work.find_by_id(params['work'])
 		@text = Text.all.where(work: params[:work])
 		# render json: @text

@@ -31,7 +31,17 @@
       		<h4 class="modal-title">Modal title</h4>
     		</div>
     		<div class="modal-body">
-      		<p>One fine body&hellip;</p>
+					<%= simple_form_for @sample_text do |f| %>
+						<%= f.input :sequence %>
+						<%= f.input :content_text, as: :bootsy %>
+						<%= f.input :color_override%>
+						<%= f.input :visibility %>
+						<%= f.input :work %>
+						<%= f.input :element %>
+						<%= f.button :submit %>
+						<%= f.submit %>
+
+					<% end %>
     		</div>
     		<div class="modal-footer">
       		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

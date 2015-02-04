@@ -28,6 +28,8 @@ Rails.application.routes.draw do
   post 'editor/select'
 
   get "editor/edit" => 'editor#edit', :as => :edit
+  #TODO: make this useful
+  post "editor/index" => 'editor#whhy', :as => :text
 
   root 'cast#index'
 
