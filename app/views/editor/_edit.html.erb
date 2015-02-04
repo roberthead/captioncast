@@ -8,7 +8,7 @@
 			<%= simple_form_for @sample_text do |f| %>
 				<%= f.bootsy_area :content_text, :class => 'form-control', editor_options: { link: false, color: false } %>
         <div class="checkbox">
-				  <%= f.input :visibility, :class => 'form-control' %>
+				  <%= f.input :visibility, :class => 'form-control glyphicon glyphicon-eye-open' %>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

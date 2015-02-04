@@ -8,26 +8,42 @@ window.onload = function () {
 </script>
 
 <body id="body-index-editor" class="body-editor">
+	<div class="container-fluid">
+		<div class="row col-xs-12">
 
-	<% @text.each do |entry| %>
-		<%= form_tag({:action => "select"},
-		 	:multipart => true, :class => "form-group") do %>
-
-			<%= content_tag :div, :class=>"form-group" do %>
-				<%= entry.content_text %>
-				<!-- <%= entry.visibility %> -->
-				<%= label_tag(entry.sequence, "visible:") %>
-				<%= check_box_tag('visibility', entry.sequence, entry.visibility) %>
-				<%= link_to 'Edit', edit_path(id: entry.sequence, work: @work.id),
-					{:remote => true,
-						'data-toggle' =>  "modal",
-						'data-target' => '#modal-window',
-						'class' => 'btn btn-primary'}  %>
-			<% end %>
-		<% end %>
-
-	<% end %>
-
-	<div id="modal-window" class="modal fade" role="dialog" aria-labelledby="myModalWindow" aria-hidden="true">
+			<div class="bs-example" >
+				<table class="table">
+					<caption>Text for some script.</caption>
+					<thead>
+						<tr>
+							<th>Text</th>
+							<th>Visibility</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% @text.each do |entry| %>
+							<tr>
+								<th><%= entry.content_text %></th>
+								<% if entry.visibility == true %>
+		  						<td><span class='glyphicon glyphicon-eye-open'></span></td>
+								<% else %>
+		  						<td><span class='glyphicon glyphicon-eye-close'></td>
+								<% end %>
+								<td><%= link_to ' Edit',
+											edit_path(id: entry.sequence, work: @work.id),
+											{:remote => true,
+												'data-toggle' =>  "modal",
+												'data-target' => '#modal-window',
+												'class' => 'btn btn-primary glyphicon glyphicon-pencil text-right'}  %></td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+			<div id="modal-window" class="modal fade" role="dialog" aria-labelledby="myModalWindow" aria-hidden="true">
+			</div>
+		</div>
 	</div>
+
 </body>
