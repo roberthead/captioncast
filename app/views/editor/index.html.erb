@@ -1,6 +1,12 @@
 
 <%= javascript_include_tag "editor" %>
 
+<script type="text/javascript">
+window.onload = function () {
+	$('#unique').remove()
+}
+</script>
+
 <body id="body-index-editor" class="body-editor">
 
 	<% @text.each do |entry| %>
