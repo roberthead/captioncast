@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
-  
+
   get  'display/select'
   post 'display/select'
   get  'display/index'
@@ -24,7 +24,10 @@ Rails.application.routes.draw do
   post 'operator/pushTextSeq'
 
   get  'editor/index'
-  post 'editor/index'
+  get  'editor/select'
+  post 'editor/select'
+
+  get "editor/index" => 'editor#edit', :as => :edit
 
   root 'cast#index'
 

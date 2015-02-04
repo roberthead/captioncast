@@ -1,15 +1,25 @@
 <body id="body-index-editor" class="body-editor">
 
-	<div class="container-fluid" id="main-editor">
+	<% @text.each do |entry| %>
+		<%= form_tag({:action => "select"},
+		 	:multipart => true, :class => "form-group") do %>
 
-		<%= form_for(@text) do |f| %>
-			<%= f.label :title %>
-			<%= f.text_field :title %>
-
-			<%= f.label :content %>
-			<%= f.bootsy_area :content %>
-
-			<%= f.submit %>
+			<%= content_tag :div, :class=>"form-group" do %>
+				<%= entry.content_text %>
+				<!-- <%= entry.visibility %> -->
+				<%= check_box_tag('visibility', entry.sequence, entry.visibility) %>
+				<%= label_tag(entry.sequence, "visible") %>
+				<%= button_tag "Continue", :type=>"submit", :class => "btn btn-primary" %>
+			<% end %>
 		<% end %>
+
+	<% end %>
+
+	<div>
+		<%= link_to 'Modal Test', edit_path,  {:remote => true, 'data-toggle' =>  "modal", 'data-target' => '#modal-window'}  %>
 	</div>
+
+	<div id="modal-window" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	</div>
+
 </body>
