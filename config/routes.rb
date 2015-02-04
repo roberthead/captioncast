@@ -28,8 +28,9 @@ Rails.application.routes.draw do
   post 'editor/select'
 
   get "editor/edit" => 'editor#edit', :as => :edit
-  #TODO: make this useful
-  post "editor/index" => 'editor#whhy', :as => :text
+  #TODO: is this necessary?
+  post "editor/index" => 'editor#text', :as => :text
+  patch "editor/index"
 
   root 'cast#index'
 

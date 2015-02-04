@@ -1,7 +1,6 @@
 class EditorController < ApplicationController
 	def index
-		@sample_text = Text.first
-		work = Work.find_by_id(params['work'])
+		@work = Work.find_by_id(params['work'])
 		@text = Text.all.where(work: params[:work])
 		# render json: @text
 	end
@@ -16,7 +15,17 @@ class EditorController < ApplicationController
 	end
 
 	def edit
-		@sample_text = Text.first
+		texts = Text.find_by(sequence: params['id'])
+		if texts.class.name != 'Text'
+			texts.each do |text|
+				if text.work_id == params['work']
+					@sample_text = text
+				end
+			end
+		else
+			@sample_text = texts
+		end
+
 		respond_to do |edit|
 			edit.html
 			edit.js

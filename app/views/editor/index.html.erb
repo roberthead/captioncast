@@ -10,18 +10,17 @@
 			<%= content_tag :div, :class=>"form-group" do %>
 				<%= entry.content_text %>
 				<!-- <%= entry.visibility %> -->
+				<%= label_tag(entry.sequence, "visible:") %>
 				<%= check_box_tag('visibility', entry.sequence, entry.visibility) %>
-				<%= label_tag(entry.sequence, "visible") %>
-				<%= button_tag "Continue", :type=>"submit", :class => "btn btn-primary" %>
+				<%= link_to 'Edit', edit_path(id: entry.sequence, work: @work.id),
+					{:remote => true,
+						'data-toggle' =>  "modal",
+						'data-target' => '#modal-window',
+						'class' => 'btn btn-primary'}  %>
 			<% end %>
 		<% end %>
 
 	<% end %>
-
-	<div>
-
-		<%= link_to 'Modal Test', edit_path,  {:remote => true, 'data-toggle' =>  "modal", 'data-target' => '#modal-window', 'class' => 'btn btn-primary btn-lg'}  %>
-	</div>
 
 	<div id="modal-window" class="modal fade" role="dialog" aria-labelledby="myModalWindow" aria-hidden="true">
 	</div>

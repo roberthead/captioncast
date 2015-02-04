@@ -7,7 +7,8 @@
     <div class="modal-body">
 			<%= simple_form_for @sample_text do |f| %>
 				<%= f.input :sequence %>
-				<%= f.input :content_text, as: :bootsy %>
+				<!-- <%= f.input :content_text, as: :bootsy, editor_options: { link: false, color: false } %> -->
+				<%= f.bootsy_area :content_text, editor_options: { link: false, color: false } %>
 				<%= f.input :color_override%>
 				<%= f.input :visibility %>
 				<%= f.input :work %>
