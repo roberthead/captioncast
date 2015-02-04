@@ -1,3 +1,5 @@
+require 'resque/server'
+
 Rails.application.routes.draw do
 
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
@@ -25,5 +27,7 @@ Rails.application.routes.draw do
   post 'editor/index'
 
   root 'cast#index'
+
+  mount Resque::Server.new, at: "/resque"
 
 end

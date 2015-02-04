@@ -15,14 +15,25 @@ https://www.pivotaltracker.com/n/projects/1184042
 ##Caption Cast Rails
 --------------------
 
-A rails implementation of [captioncast](https://bitbucket.org/andrewkr/captioncast) authored by [Andrew Krug](https://bitbucket.org/andrewkr)
+An open source multilingual open caption project.  Inspired by [captioncast](https://bitbucket.org/andrewkr/captioncast) authored by [Andrew Krug](https://bitbucket.org/andrewkr)
 
-###Tools:
+###Development Tools:
 ---------
 
-`sudo yum install -y ruby ruby-devel rubygems libxml2-devel libxslt-devel sqlite3-devel openssl-devel @development``gem install rails``bundle`
+`sudo yum install -y ruby ruby-devel rubygems redis libxml2-devel libxslt-devel sqlite3-devel openssl-devel @development`  
+`gem install rails`  
+`bundle`  
+`rake db:migrate`
+`rake db:seed`
+`systemctl enable redis`
+`systemctl start redis`
+`rails s`
 
-A vagrant file is also provided in the project for use.
+In another terminal run: `rake resque:work QUEUE='*'`
+Load the resque schedule `rake resque:setup_schdule`
+Finally run the resque task scheduler `rake resque:scheduler`
+
+A vagrant file is also provided in the project for use.  
 
 ##Docker Support:
 -----------------
@@ -33,18 +44,16 @@ Docker image is published here for consumption:
 
 [DockerHub](https://registry.hub.docker.com/u/andrewkrug/captioncast/)
 
-###Chromecast Prep:
--------------------
-
 ###Resources:
 -------------
 
 -	[Nokogiri Docs](http://www.nokogiri.org/tutorials/)
--	[Chromecast Gem](https://rubygems.org/gems/chromecast)
--	[Chromecast Gem Documentation](http://rubydoc.info/gems/chromecast/1.0/frames)
 
 ###Contributors
 ---------------
 
 -	[Andrew Krug](https://bitbucket.org/andrewkr)
 -	[Joel Ferrier](https://bitbucket.org/joel-ferrier)
+-	[Randolph Jones](https://github.com/randolphjones)
+-	[Tony Hess](https://github.com/toeknee919)
+-	[Amanda Denbeck](https://github.com/denbecka)

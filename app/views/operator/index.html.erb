@@ -1,11 +1,10 @@
-<%= javascript_tag do %>
-var operator= '<%=@operator%>';
-var view_mode= '<%=@view_mode%>';
-var work= '<%=@work%>';
-<%end%>
+<script>
+	var viewMode= '<%= @view_mode %>';
+	var work= '<%= @work %>';
+</script>
 
 <body id="body-ind-operator" class="body-operator">
-	<%= render "shared/json_injection" %>
+	<%= render "shared/js_global_injection" %>
 	<div class="container-fluid" id="main-operator">
 		<div class="row" id="main-row-operator">
 			<div class="col-md-3 col-xs-2" id="commit-column-operator">
@@ -14,10 +13,17 @@ var work= '<%=@work%>';
 					</span>
 				</div>
 				<div id="preview-operator" data-visible="false">
-
-					<iframe src="" frameBorder="0" scrolling="no"></iframe>
+					<div id="prev-holder-operator">
+						<div id="prev-spinner-operator">Loading...</div>
+						<iframe src="" frameBorder="0" scrolling="no"></iframe>
+						
+						<!--
+						<div id="prev-operator">
+							This is a line
+						</div
+						-->
+					</div>
 					<span id="previcon-operator" class="glyphicon glyphicon-eye-open"></span>
-					<div id="prev-spinner-operator">Loading...</div>
 
 				</div>
 				<div id="fforward-operator"data-visible="false">
@@ -46,7 +52,10 @@ var work= '<%=@work%>';
 		<!-- fixed interface items -->
 
 	<div id="blackout-operator">
-		<span id="blackout-icon-operator" class="glyphicon glyphicon-off"></span>
+		<span id="blackout-icon-operator" class="glyphicon glyphicon-off blackout-off-operator"></span>
+	</div>
+	<div id="autocommit-operator">
+		<span id="autocommit-icon-operator" class="glyphicon glyphicon-lock autocommit-on-operator"></span>
 	</div>
 	</div>
 </body>

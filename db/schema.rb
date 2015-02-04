@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20150122232842) do
   create_table "operators", force: true do |t|
     t.text     "name"
     t.text     "view_attributes"
+    t.integer  "position"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "work_id"
