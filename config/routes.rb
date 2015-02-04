@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   get  'editor/select'
   post 'editor/select'
 
-  get "editor/index" => 'editor#edit', :as => :edit
+  get "editor/edit" => 'editor#edit', :as => :edit
 
   root 'cast#index'
 

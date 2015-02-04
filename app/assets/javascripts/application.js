@@ -13,6 +13,5 @@
 //= require underscore
 //= require jquery
 //= require jquery_ujs
-//= require bootsy
 //= require bootstrap-sprockets
 //= require turbolinks

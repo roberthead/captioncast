@@ -15,9 +15,9 @@ class EditorController < ApplicationController
 	end
 
 	def edit
-		respond_to do |format|
-			format.html
-			format.js
+		respond_to do |edit|
+			edit.html
+			edit.js
 		end
 	end
 end
