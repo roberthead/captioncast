@@ -1,15 +1,17 @@
 class OperatorController < ApplicationController
 	def index
 		#convert all lines to json and pass along in variable
-		#disabled at the moment so fixture data can be used
-
-		#set the operator variable
 		@operator = params[:operator]
 		@view_mode = params[:view_mode]
 		@work = params[:work]
 		# slurp up the required text
 		@jtext = Text.all.where(work: params[:work]).to_json(:include => :element)
 		# add the default position of 0 for an operator
+	end
+
+	def pushBlackout
+		$isBlackout = params[:blackout]
+		render :json => $isBlackout
 	end
 
 	def pushTextSeq
@@ -20,12 +22,11 @@ class OperatorController < ApplicationController
 
 		# for debug purposes
 		render :json => params[:seq]
-		#when we're in production and don't need a reply
-		#render :nothing => true
+
+
 	end
 
 	def select
-		#TODO: refactor, break out into several methods
 		@operators = Operator.all
 		if request.get?
 			now = DateTime.now
@@ -52,8 +53,6 @@ class OperatorController < ApplicationController
 				operator_name = params[:operator]
 				view_mode = params[:view]
 				work = params[:work]
-				#TODO: check to see if we will be creating a duplicate
-
 				operator = Operator.create!(name: operator_name[:name],
 					view_attributes: params[:view], work_id: params[:work], position: 0)
 			end
@@ -61,7 +60,6 @@ class OperatorController < ApplicationController
 			# set position to the value stored in the operator record
 			Rails.application.config.operator_positions.merge!(
 				{operator.id => operator.position})
-			# redirect to index
 			redirect_to :controller => 'operator', :action => 'index',
 				:work => work, :view_mode => view_mode,
 				:operator => operator.id

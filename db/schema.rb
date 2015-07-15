@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 20150122172125) do
     t.boolean  "visibility"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "operator_note"
     t.integer  "work_id"
     t.integer  "element_id"
   end
@@ -65,6 +66,7 @@ ActiveRecord::Schema.define(version: 20150122172125) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "language"
+    t.integer  "characters_per_line"
     t.integer  "venue_id"
   end
 

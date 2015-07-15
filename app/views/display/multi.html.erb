@@ -1,92 +1,25 @@
+<div id="multi-flag-display" style="display:none"></div>
 
-<%= javascript_include_tag "display" %>
-<%= javascript_include_tag "operator" %>
+<div class="container-fluid" id="main-display">
+  <div class="row" id="row-display-multi">
+    <div id="buffer-top-display-multi"></div>
+    <div class="col-lg-12 col-xs-12" id="line-holder-display-multi">
+      <div class="line-display-multi" id="line-display-0" data-sequence="0">
+      	<span class="line-full-display">
+      		<span class="line-char-display"></span>
+      		<span class="line-content-display"><br></span>
+      	</span>
+      </div>
+    </div>
+    <div id="buffer-bottom-display-multi"></div>
+  </div>
+</div>
+
+<div id="shade-multi"></div>
+<div id="shade-loading-display">The script is now loading...</div>
 
 <%= javascript_tag do %>
   var operator= '<%=@operator%>'
 <%end%>
 
-<body id="body-index-display" class="body-display">
-  <div id="multi-flag-display" style="display:none"></div>
-
-  <%= render "shared/js_global_injection" %>
-
-  <div class="container-fluid" id="main-display">
-    <div class="row" id="row-display-multi">
-      <div id="buffer-top-display-multi"></div>
-      <div class="col-lg-12 col-xs-12" id="line-holder-display-multi">
-
-      </div>
-      <div id="buffer-bottom-display-multi"></div>
-
-    </div>
-
-  </div>
-    <div id="shade-multi"></div>
-
-   <div id="gradient-top-display-multi" class="grad-shades-display-multi">
-   </div>
-   <!--
-   <div id="gradient-bottom-display-multi" class="grad-shades-display-multi">
-   </div-->
-
-</body>
-  <!--Javascript at bottom of ERB template for more awesome. -->
-  <!--<script language="javascript" type="text/javascript">
-  //Store the current position in HTML 5 localStorage
-  if (localStorage["position"] > 0){
-      //Need to figure out a way to store this with script title.  Problem for later.
-  }
-  else {
-
-      //If there's nothing in there set it to zero.
-      localStorage.setItem("position", 0);
-  }
-
-  //Pull the current position in the text out of local storage.
-  var currline = localStorage["position"]
-
-  //Display the element just pulled out of local position on refresh.
-  $( "#" + localStorage["position"] ).show( "slow", function() {});
-
-  //Click listener for the next button.
-  $( "#Next" ).click(function() {
-    strcurr = "#" + currline
-    strprev = "#" + (currline - 1)
-
-    //Use jquery animations.
-    $( strcurr ).show( "slow", function() {
-    });
-    $( strprev ).hide( "slow", function() {
-    });
-
-    //Update localStorage on successful next-item.
-    localStorage.setItem("position", currline);
-    currline++
-  });
-
-  //Click listener for previous button.
-  $( "#Prev" ).click(function() {
-    strcurr = "#" + currline
-    strprev = "#" + (currline - 1)
-
-    //Use jquery animations.
-    $( strcurr ).hide( "slow", function() {
-    });
-
-    $( strprev ).show( "slow", function() {
-    });
-
-    //Decrement current line.
-    currline--
-
-    //Update localStorage on successful next-item.
-    localStorage.setItem("position", currline);
-  });
-
-</script>
--->
-
-<!--
-</div>
--->
+<%= render "shared/js_global_injection" %>

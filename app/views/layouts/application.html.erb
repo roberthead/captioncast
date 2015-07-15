@@ -1,40 +1,23 @@
-<!--
-  randolph todos - just a few
-  - set up action view partials
-    - render "header"
-      - roll in content as json with 
-        - controller: @jtext = Text.all.to_json
-        - view: raw @jtext
-      - include underscore with include helper
-      - include partial that holds underscore templates
-      - include custom js module for timed ajax calls to retrieve golden index
-    - main top bar
-  - controller 
-    - set controller to vend the golden index number as json
-    - set controller to SET the golden index number from param
-
--->
-
 <!DOCTYPE html>
 <html>
   <head>
-
-
     <title>Caption Cast</title>
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
     <%= csrf_meta_tags %>
-    <!-- load fixtures here -->
     <!--load underscore templats here-->
     <%= render 'shared/front_templates' %>
     <meta name="viewport" content="initial-scale=1">
   </head>
-  <%= yield %>
+
+  <body id="body-<%= controller_name %>-<%= action_name %>" class="body-<%= controller_name %>">
+
+    <%= yield %>
 
     <!--</div>-->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <!--<%= javascript_include_tag "application.js" %>-->
+    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  </body>
 </html>
-

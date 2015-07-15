@@ -1,4 +1,5 @@
 class EditorController < ApplicationController
-	def index
-	end
+  def index
+    @editor = Text.all.where(work: params[:work])
+  end
 end

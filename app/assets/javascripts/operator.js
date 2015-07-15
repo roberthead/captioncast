@@ -3,324 +3,257 @@ _.templateSettings = {
     interpolate: /\{\{\=(.+?)\}\}/g,
     evaluate: /\{\{(.+?)\}\}/g
 };
-var targeted = 1;
-var current = 1;
-var scrollSpd = 500;
-var blackout = false;
-var autoCommit = true;
-var scrolling = false;
-//line in reserve when it's blackout mode. Defaults to 1.
-//var reserveLine = 1;
-//var lineMapping;
 
+var $targeted, $current;
+var isBlackout = 1;
+var scrolling = false;
+var opScrollSpd= 400;
+
+var $lines; //jquery object to hold line elements
 
 $(document).ready(function(){
-	//if we're in the operator view
-	if($('#main-operator').length>0){
-		//this function will universally commit the targeted line
-		function commit(){
-				//post the current sequence identifier through AJAX
-				if($('.target-operator').attr('data-visibility')=="true"){
-					$.ajax('/operator/pushTextSeq', {
-						type:'POST',
-						data: {
-							seq:$('.target-operator').attr('data-sequence'),
-	            operator: operator
-						},
-						success:(function(d){
-							//display logic if successful
-							$('.current-operator').removeClass('current-operator');
-							$('.target-operator').addClass('current-operator');
-							if(blackout){
-								$('#blackout-icon-operator').addClass('blackout-off-operator');
-								blackout=false;
-							}
-							current=$('.target-operator').attr('data-sequence');
-						}),
-						error:(function(){
-							//put in better error handling here
-							alert('Commit failed! Please check your connection.');
-						}),
-					});
+	if($('#main-operator').length>0){		
+		//blackout screen and move to text sequence 0 when the operator is reset -!!!-
 
-				}
-
-		}
-
+		//set the main operator's height to the height of the window
+		//can do with with css by setting position:absolute top:0 bottom:0 -!!!-
 		$('#main-operator').height($(window).innerHeight()+'px');
 
-		//console.log('this is the operator view');
+		//set the middlepoint
+		//don't think this is needed once the find mid method is removed -!!!-
+		var mid = Math.round($(window).innerHeight()/2);
+
+		//scrolls to desired element
+		//can include a callback function
+		function aniScroll(el, c){
+			$('#line-holder-operator').stop().animate({scrollTop: el['offsetTop'] +  Math.round(el['offsetHeight']/2) - mid}, opScrollSpd, c);
+		}
+
+		//traverse operator after commit
+		function seqPushed(d){
+			aniScroll($targeted[0]);
+			$current.removeClass('current-operator');
+			$current.removeClass('target-operator');
+			$current=$targeted;
+			$current.addClass('current-operator');
+			$current.addClass('target-operator');
+			
+			console.log(d + ' pushed ');
+		}
+
+		//push text sequence to operator controller
+		function commit(){
+			if($targeted.attr('data-visibility')=="true"){
+				$.ajax('/operator/pushTextSeq', {
+					type:'POST',
+					data: {
+						seq:$targeted.attr('data-sequence'),
+			            operator: operator
+					},
+					success:seqPushed,
+					error:(function(){
+						$targeted=$current;
+						alert('Commit failed! Please check your connection.');
+					})
+				});
+			}
+		}
+
+		function blackout() {
+			isBlackout = isBlackout == 1 ? 0 : 1;
+			$.ajax('/operator/pushBlackout', {
+				type:'POST',
+				data: {
+					blackout: isBlackout
+				},
+				success:(function(d) {
+					console.log("blackout: " + d);
+					$('#blackout-icon-operator').toggleClass('blackout-off-operator');
+				}),
+				error:(function() {
+					alert('Blackout failed! Please check your connection.');
+				})
+			});
+		}
+
+		//TEMPLATING - all of this can eventually be moved to the controller -!!!-
 		//set the templates
 		var tLine = _.template($('#line-template-operator').html());
-
 		//make sure the lines are sorted by sequence instead of index when read in
-		lines = _.sortBy(lines,function(q){
-			return q.sequence;
+		//native array.prototype.sort
+		lines.sort(function(a, b){
+			if(a.sequence < b.sequence){
+				return -1;
+			}
+			if(a.sequence > b.sequence){
+				return 1;
+			}
+			return 0;
 		});
 
-		//templating per line
-		_.each(lines, function(q, i){
-			//this is a temporary scrub in of fixture characters
-			//q.character = 'Character';
-
-			//append character name with colon
-			if(q.element.element_name.length>0){
-				//append the colon
-				q.character = q.element.element_name + ':';
-			}else{
-				q.character=' ';
-			}
-			$('#line-holder-sub-operator').append(
-				tLine(q)
-			);
-			/*
-			if(q.visibility){
-				$('#line-holder-sub-operator').append(
-					tLine(q)
-				);
-			}else{
-				//need handling for non-visible items
-				//show them with different styling
-				//
-			}*/
-			$('.line-operator').first().addClass('target-operator');
-			$('.line-operator').each(function(){
-				if($(this).attr('data-visibility')=="false"){
-					$(this).addClass('line-non-visible-operator');
+	
+		$lineCont = $('#line-holder-sub-operator');
+		// var il = lines.length-1;
+		var il = 0;
+		var ll = lines.length; 
+		var lc, cc;
+		while(il<ll){
+			if(lines[il]['visibility']){
+				var cl = lines[il];
+				cc = cl['element']['element_name'];
+				if(cc.length>0&&cc!=lc){
+					cl['character'] = cl['element']['element_name'] + ':';
+					lc = cc;
+				}else{
+					cl['character']=' ';
 				}
-			});
-		});
-		//this happens when you click the commit button
-		$('#commit-button-operator').click(commit);
-		//scrolling target feature
-		$('#line-holder-operator').scroll(function(){
-			var updateInt = 100;
-			//self destroying counter that catches up the highlighting
-			if(!window.counting){
-				window.counting = setTimeout(function(){
-					//removed the targeted class
-					$('.target-operator').removeClass('target-operator');
-					var mid = $(window).innerHeight()/2.2;
-					var l = _.sortBy($('#line-holder-operator div.line-operator'), function(q){
-						return Math.abs($(q).offset().top-mid);
-					})
-					$(l[0]).addClass('target-operator');
-					targeted = parseInt($(l[0]).attr('data-sequence'));
-					//destroy the counter
-					window.counting=false;
-				}, updateInt);
+				if(lines[il]['operator_note']){
+					$lineCont.append(tLine(cl) + "<div class='line-operator line-note' data-visibility='false'> ---" + lines[il]['operator_note'] + "---</div>");
+				}
+				else{
+					$lineCont.append(tLine(cl));
+				}
 			}
+			il++;
+		}
 
+		//clear the lines object now that it's been used
+		lines=undefined;
+
+		//store the new DOM lines inside of a jquery object
+		$lines = $('.line-operator');
+		//actually, would be good if lines were read into the array with sequence numbers for index vals?
+
+		//ID for non-visual lines
+		$lines.each(function(){
+			if($(this).attr('data-visibility')=="false"){
+				$(this).addClass('line-non-visible-operator');
+			}
 		});
-		//click the line I want feature
-		$('.line-operator').click(function(){
-			var diff = ($('.target-operator').position().top - $(this).position().top)*1.0;
-			$('#line-holder-operator').animate(
-				{scrollTop:
-					$('#line-holder-operator').scrollTop() - diff
-				}, scrollSpd);
-			});
-
-		//action that rolls down preview and poplates is
-		$('#preview-operator').click(function(){
+		//END TEMPLATING - all of this can eventually be moved to the controller -!!!-
 
 
+
+
+		$targeted = $('.line-operator').first();
+		$targeted.addClass('target-operator');
+		$current = $targeted;
+		$current.addClass('current-operator');
+		commit();
+		blackout();
+
+		//bind click handler to commit button
+		$('#commit-button-operator').click(commit);
+
+		//bind click handler to line operators
+		$('.line-operator').not('.line-note').click(function(){
+			//remove target operator class
+			$targeted.removeClass('target-operator');
+			//set targeted to the line that was clicked on
+			$targeted = $(this);
+			//add targeted class to new line operator
+			$targeted.addClass('target-operator');
+		});
+
+		//bind click event to the preview operator
+		$('#preview-operator').click(function() {
+			//if isn't visible
 			if($(this).attr('data-visible')=='false'){
-				$(this).animate({left:'0px'}, 1000, function(){
+				$(this).stop().animate({left:'0px'}, 1000, function(){
+					//make visible
 					$(this).attr('data-visible', 'true');
-					
+					//set src for iframe if not already set
 					if($('#preview-operator iframe').attr('src')==""){
 						$('#preview-operator iframe').attr('src', "/display/index?operator="+operator+"&view="+viewMode+"&work="+work);
 					}
-					
 				});
-			}else{
+			} else {
+				//make it no visible
 				$(this).animate({left:'-100%'}, 1000, function(){
 					$(this).attr('data-visible', 'false');
 				});
+				//should maybe reset the src of the iframe to "" so that it's not continuing to pull the server while hidden -!!!-
 			}
 
 		});
-		//roll down the fast forward feature
-		$('#fforward-operator').click(function(){
-			if($(this).attr('data-visible')=='false'){
-				$(this).animate({left:'0px'}, 1000, function(){
-					$(this).attr('data-visible', 'true');
-					$(this).find('input').first().focus();
-				});
-			}else{
-				$(this).animate({left:'-100%'}, 1000, function(){
-					$(this).attr('data-visible', 'false');
-					$(this).find('input').first().blur();
-
-				});
-			}
-
-
+		
+		//bind click event to the blackout operator
+		$('#blackout-operator').click(function(){
+			blackout();
 		});
 
-		//submit a line number
-		$('#fforward-operator input').keypress(function(e){
-			if(e.which == 13){
-				//console.log($(this).val());
-				var s = $(this).val();
-				var l = _.find($('.line-operator'), function(q){
-					return $(q).attr('data-sequence')==s;
-				});
-				//console.log(l);
-				//this may be able to be abstracted to a single function
+		//bind click event to the up button
+		$('#up-button-operator').click(function(){
+			//if current is not data sequence 0
+			if($current.attr('data-sequence') != 0) {
+				//traverse previous line operators until a visible one is found
+				$targeted.removeClass('target-operator');
+				$targeted = $current.prev(".line-operator");
+				while($targeted.attr('data-visibility') == "false") 
+					$targeted = $targeted.prev(".line-operator");
+				//commit
+				commit();
+			}
+		});
 
-				if(l){
-				var diff = ($('.target-operator').position().top - $(l).position().top)*1.0;
-				$('#line-holder-operator').animate(
-					{scrollTop:
-						$('#line-holder-operator').scrollTop() - diff
-					}, scrollSpd);
-				}else{
-					alert('Line ' + s + ' not found');
-				}
+		//bind click event to the down button
+		$('#down-button-operator').click(function(){
+			//if current is not the last data-sequence
+			if($current.attr('data-sequence') != $('.line-operator').last().attr('data-sequence')) {
+				//traverse next line operators until a visible one is found
+				$targeted.removeClass('target-operator');
+				$targeted = $current.next(".line-operator");
+				while($targeted.attr('data-visibility') == "false") 
+					$targeted = $targeted.next(".line-operator");
+				//commit
+				commit();
+			}
+		});
 
-				$('#fforward-operator').animate({left:'-100%'}, 1000, function(){
-					$(this).attr('data-visible', 'false');
-					var i = $(this).find('input').first();
-					i.blur();
-					i.val('');
-
-				});
-
+		//prevent scrolling on keydown when the operator view is focused
+		$(document).keydown(function(e) {
+			if(e.which == 38 || e.which == 40 || e.which == 32) {
+				e.preventDefault();
 				return false;
 			}
 		});
-		/*
-		//need to debug this block
-		$('#fforward-operator input').blur(function(){
-				$('#fforward-operator').animate({left:'-100%'}, 500, function(){
-					$(this).attr('data-visible', 'false');
-					var i = $(this).find('input').first();
-					i.blur();
-					i.val('');
-
-				});
-			});
-		*/
-
-		//blackout the display
-		$('#blackout-operator').click(function(){
-			//console.log('blackout');
-			if(!blackout){
-				$.ajax('/operator/pushTextSeq', {
-					type:'POST',
-					data: {
-						seq:0,
-	          operator: operator
-					},
-					success:(function(d){
-						console.log('display cleared');
-						$('.current-operator').removeClass('current-operator');
-						$('#blackout-icon-operator').toggleClass('blackout-off-operator');
-						blackout=true;
-					}),
-				});
-			}else{
-				$.ajax('/operator/pushTextSeq', {
-					type:'POST',
-					data: {
-						seq:current,
-	          operator: operator
-					},
-					success:(function(d){
-						console.log('display is back');
-						var last = $.grep($('.line-operator'), function(n){
-							return $(n).attr('data-sequence') == current;
-						})[0];
-						$(last).addClass('current-operator');
-						//$('.current-operator').removeClass('current-operator');
-						$('#blackout-icon-operator').toggleClass('blackout-off-operator');
-						blackout=false;
-					}),
-				});
-			}
-
-
-		});
-		$('#autocommit-operator').click(function(){
-			if(autoCommit){
-				autoCommit = false;
-				console.log('autocommit off');
-
-			}else{
-				autoCommit = true;
-				console.log('autocommit on');
-
-			}
-			console.log(this);
-			$('#autocommit-icon-operator').toggleClass('autocommit-on-operator')
-		});
-
-		//single up and down buttons
-		$('#up-button-operator').click(function(){
-			if(!scrolling){
-				scrolling=true;
-				var prevNum = parseInt($('.target-operator').first().attr('data-sequence'))-1;
-				var firstNum = parseInt($('.line-operator').first().attr('data-sequence'));
-				var finalNum = parseInt($('.line-operator').last().attr('data-sequence'));
-				console.log(prevNum);
-				if(prevNum >= firstNum && prevNum < finalNum){
-					var prevTar;
-					while(typeof prevTar==='undefined' && prevNum >= firstNum){
-						prevTar = $.grep($('.line-operator'), function(n){
-							return $(n).attr('data-sequence') == prevNum;
-						})[0];
-						prevNum--;
-						console.log(prevTar);
+		//up and down keys
+		$(document).keyup(function(e) {
+			e.preventDefault();
+			switch(e.which) {
+				case 38: //up
+					//if current is not data sequence 0
+					if($current.attr('data-sequence') != 0) {
+						//traverse previous line operators until a visible one is found
+						$targeted.removeClass('target-operator');
+						$targeted = $current.prev(".line-operator");
+						while($targeted.attr('data-visibility') == "false") 
+							$targeted = $targeted.prev(".line-operator");
+						//commit
+						commit();
 					}
-					var diff = ($('.target-operator').position().top - $(prevTar).position().top)*1.0;
-					$('#line-holder-operator').animate(
-						{scrollTop:
-							$('#line-holder-operator').scrollTop() - diff
-						}, scrollSpd, function(){
-							if(autoCommit){
-								commit();
-							}
+					break;
+				case 40: //down
+					//if current is not the last data-sequence
+					if($current.attr('data-sequence') != $('.line-operator').last().attr('data-sequence')) {
+						//traverse next line operators until a visible one is found
+						$targeted.removeClass('target-operator');
+						$targeted = $current.next(".line-operator");
+						while($targeted.attr('data-visibility') == "false") 
+							$targeted = $targeted.next(".line-operator");
 
-							scrolling=false;
-						});
-				}
-			}	
-		});
-		$('#down-button-operator').click(function(){
-			if(!scrolling){
-				scrolling=true;
-				var nextNum = parseInt($('.target-operator').first().attr('data-sequence'))+1;
-				var firstNum = parseInt($('.line-operator').first().attr('data-sequence'));
-				var finalNum = parseInt($('.line-operator').last().attr('data-sequence'));
-				if(nextNum <= finalNum && nextNum >= firstNum){
-					var nextTar;
-					while(typeof nextTar==='undefined' && nextNum < finalNum){
-						nextTar = $.grep($('.line-operator'), function(n){
-							return $(n).attr('data-sequence') == nextNum;
-						})[0];
-						nextNum++;
+						console.log($targeted.get());
+						//commit
+						commit();
 					}
-					//console.log(nextTar);
-					var diff = ($('.target-operator').position().top - $(nextTar).position().top)*1.0;
-					$('#line-holder-operator').animate(
-						{scrollTop:
-							$('#line-holder-operator').scrollTop() - diff
-						}, scrollSpd, function(){
-							if(autoCommit){
-								commit();
-							}
-
-							scrolling=false
-						});
-				}
+					break;
+				case 32: //spacebar
+					blackout();
+					break;
 			}
 		});
 
-
-
-
+		//hide the shade loading operator once the page has loaded
+		$('#shade-loading-operator').fadeOut(1000, function(){});
 	}
-
 });
